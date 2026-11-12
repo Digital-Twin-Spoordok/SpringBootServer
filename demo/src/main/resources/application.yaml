@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: demo
+ollama:
+  base-url: http://127.0.0.1:11434
+  model: qwen3.5:4b
+
