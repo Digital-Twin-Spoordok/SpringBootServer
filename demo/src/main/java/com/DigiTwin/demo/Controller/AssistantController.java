@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.DigiTwin.demo.Service.AIService;
 import com.DigiTwin.demo.Service.ToolExecutor;
 
+@CrossOrigin(origins = "http://127.0.0.1:5500/")
 @RestController
 @RequestMapping("/api/assistant")
 public class AssistantController {
@@ -75,19 +76,33 @@ public class AssistantController {
             Object messageValue = aiResponse.get("message");
 
             String answer = "";
+            String thinking = "";
 
             if (messageValue instanceof Map) {
-                Object content =
-                    ((Map<?, ?>) messageValue).get("content");
+                Map<?, ?> message = (Map<?, ?>) messageValue;
 
-                if (content != null) {
-                    answer = content.toString();
+                Object contentValue = message.get("content");
+                Object thinkingValue = message.get("thinking");
+
+                if (contentValue instanceof String) {
+                    answer = ((String) contentValue).trim();
                 }
+
+                if (thinkingValue instanceof String) {
+                    thinking = ((String) thinkingValue).trim();
+                }
+            }
+
+            // Geef een bevestiging als er wel een actie is uitgevoerd,
+            // maar Qwen geen normaal tekstantwoord heeft gegeven.
+            if (answer.isEmpty() && !actions.isEmpty()) {
+                answer = "Ik heb de opdracht uitgevoerd!";
             }
 
             // 4. Response naar frontend
             return Map.of(
                 "answer", answer,
+                "thinking", thinking,
                 "actions", actions,
                 "model", "ollama"
             );
