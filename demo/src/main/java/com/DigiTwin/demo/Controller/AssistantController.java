@@ -1,54 +1,108 @@
+
 package com.DigiTwin.demo.Controller;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.DigiTwin.demo.Service.AIService;
+import com.DigiTwin.demo.Service.ToolExecutor;
 
 @RestController
 @RequestMapping("/api/assistant")
 public class AssistantController {
-    private final WebClient webClient;
-    private final String model;
 
-    public AssistantController(WebClient.Builder builder,
-            @Value("${ollama.base-url:http://localhost:11434}") String baseUrl,
-            @Value("${ollama.model:qwen3.5:4b}") String model) {
-        this.webClient = builder.baseUrl(baseUrl).build();
-        this.model = model;
+    private final AIService aiService;
+    private final ToolExecutor toolExecutor;
+
+    public AssistantController(
+            AIService aiService,
+            ToolExecutor toolExecutor) {
+
+        this.aiService = aiService;
+        this.toolExecutor = toolExecutor;
     }
 
     @PostMapping("/chat")
-    public Map<String, String> chat(@RequestBody ChatRequest request) {
-        if (request == null || request.message == null || request.message.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bericht mag niet leeg zijn.");
+    public Map<String, Object> chat(
+            @RequestBody ChatRequest request) {
+
+        if (request == null
+                || request.message == null
+                || request.message.trim().isEmpty()) {
+
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Bericht mag niet leeg zijn."
+            );
         }
+
         if (request.message.length() > 4000) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bericht mag maximaal 4.000 tekens bevatten.");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Bericht mag maximaal 4.000 tekens bevatten."
+            );
         }
-        Map<String, Object> payload = Map.of("model", model, "stream", false,
-                "messages", List.of(Map.of("role", "user", "content", request.message.trim())));
+
         try {
-            Map response = webClient.post().uri("/api/chat").bodyValue(payload)
-                    .retrieve().bodyToMono(Map.class).block(Duration.ofMinutes(3));
-            Object messageValue = response == null ? null : response.get("message");
-            Object answerValue = messageValue instanceof Map ? ((Map) messageValue).get("content") : null;
-            String answer = answerValue == null ? null : answerValue.toString();
-            if (answer == null || answer.trim().isEmpty()) throw new IllegalStateException("Ollama gaf geen antwoord.");
-            return Map.of("answer", answer, "model", model);
+
+            // 1. Vraag naar AI sturen
+            Map<String, Object> aiResponse =
+                aiService.askAI(request.message.trim());
+
+                System.out.println("========== OLLAMA RESPONSE ==========");
+                System.out.println(aiResponse);
+                System.out.println("=====================================");
+
+            if (aiResponse == null) {
+                throw new IllegalStateException(
+                    "Ollama gaf geen response."
+                );
+            }
+
+            // 2. Controleren op tool calls
+            List<Map<String, Object>> actions =
+                toolExecutor.processToolCalls(aiResponse);
+
+                System.out.println("========== PROCESSED ACTIONS ==========");
+                System.out.println(actions);
+                System.out.println("=======================================");
+
+            // 3. Gewone AI-tekst ophalen
+            Object messageValue = aiResponse.get("message");
+
+            String answer = "";
+
+            if (messageValue instanceof Map) {
+                Object content =
+                    ((Map<?, ?>) messageValue).get("content");
+
+                if (content != null) {
+                    answer = content.toString();
+                }
+            }
+
+            // 4. Response naar frontend
+            return Map.of(
+                "answer", answer,
+                "actions", actions,
+                "model", "ollama"
+            );
+
         } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
-                    "Ollama is niet bereikbaar. Start Ollama en controleer model " + model + ".", ex);
+
+            throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Er is iets misgegaan bij de AI-verwerking.",
+                ex
+            );
         }
     }
 
-    public static class ChatRequest { public String message; }
+    public static class ChatRequest {
+        public String message;
+    }
 }
