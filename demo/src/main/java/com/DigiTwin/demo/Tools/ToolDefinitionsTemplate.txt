@@ -1,0 +1,32 @@
+            "type", "function",
+                "function", Map.of(
+                    "name", "Name of the function",
+                    "description",
+                    "Zet hier de beschrijving " +
+                    "Van de Functie"
+                    ,
+
+                    "parameters", Map.of(
+                        "type", "object",
+
+                        "properties", Map.of(
+                            "Propertie 1", Map.of(
+                                "type", "Wat voor type propertie is het",
+                                "description", "Beschrijving van de Propertie"
+                            ),
+
+                            "longitude", Map.of(
+                                "type", "number",
+                                "description", "Lengtegraad van de locatie (-180 tot 180)"
+                            )
+                        ),
+
+                        "required", List.of(
+                            "Welke",
+                            "propertie",
+                            "is",
+                            "bij deze functie",
+                            "required"
+                        )
+                    )
+                )

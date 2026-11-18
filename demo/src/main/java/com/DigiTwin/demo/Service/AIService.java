@@ -68,7 +68,7 @@ public class AIService {
                 .bodyValue(payload)
                 .retrieve()
                 .bodyToMono(Map.class)
-                .block(Duration.ofMinutes(10));
+                .block(Duration.ofMinutes(3));
 
         } catch (Exception ex) {
             throw new RuntimeException(

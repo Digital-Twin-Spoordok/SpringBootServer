@@ -139,6 +139,12 @@ public class ToolExecutor {
                     )
                 ));
             }
+             // TOOL 2: Een gebouw plaatsen
+            else if ("RetrieveEntities".equals(name)) {
+                actions.add(Map.of(
+                    "type", "RetrieveEntities"
+                ));
+            }
         }
 
         return actions;

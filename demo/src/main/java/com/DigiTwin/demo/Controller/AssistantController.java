@@ -41,7 +41,7 @@ public class AssistantController {
             );
         }
 
-        if (request.message.length() > 4000) {
+        if (request.message.length() > 400000) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Bericht mag maximaal 4.000 tekens bevatten."
@@ -51,8 +51,7 @@ public class AssistantController {
         try {
 
             // 1. Vraag naar AI sturen
-            Map<String, Object> aiResponse =
-                aiService.askAI(request.message.trim());
+            Map<String, Object> aiResponse = aiService.askAI(request.message.trim());
 
                 System.out.println("========== OLLAMA RESPONSE ==========");
                 System.out.println(aiResponse);
@@ -65,8 +64,7 @@ public class AssistantController {
             }
 
             // 2. Controleren op tool calls
-            List<Map<String, Object>> actions =
-                toolExecutor.processToolCalls(aiResponse);
+            List<Map<String, Object>> actions = toolExecutor.processToolCalls(aiResponse);
 
                 System.out.println("========== PROCESSED ACTIONS ==========");
                 System.out.println(actions);
@@ -77,12 +75,14 @@ public class AssistantController {
 
             String answer = "";
             String thinking = "";
+            String toolCall = "";
 
             if (messageValue instanceof Map) {
                 Map<?, ?> message = (Map<?, ?>) messageValue;
-
+                System.err.println(message);
                 Object contentValue = message.get("content");
                 Object thinkingValue = message.get("thinking");
+                Object ToolCallValue = message.get("tool_calls");
 
                 if (contentValue instanceof String) {
                     answer = ((String) contentValue).trim();
@@ -90,6 +90,10 @@ public class AssistantController {
 
                 if (thinkingValue instanceof String) {
                     thinking = ((String) thinkingValue).trim();
+                }
+
+                if (ToolCallValue instanceof String) {
+                    toolCall = ((String) ToolCallValue).trim();
                 }
             }
 
@@ -104,6 +108,7 @@ public class AssistantController {
                 "answer", answer,
                 "thinking", thinking,
                 "actions", actions,
+                "ToolCalls", toolCall,
                 "model", "ollama"
             );
 

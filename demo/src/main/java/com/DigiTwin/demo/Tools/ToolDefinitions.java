@@ -68,7 +68,13 @@ public class ToolDefinitions {
                         )
                     )
                 )
-            )
+            ),
+            Map.of("function", Map.of(
+                    "name", "RetrieveEntities",
+                    "description",
+                    "This function collects all the entities that exist in CesiumJS "
+            ))
+                
         );
     }
 }
