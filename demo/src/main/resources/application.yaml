@@ -2,9 +2,8 @@ spring:
   application:
     name: demo
 
-  data:
-    mongodb:
-      uri: mongodb://admin:secret@localhost:27017/mijnDatabase?authSource=admin
+  mongodb:
+    uri: mongodb://admin:secret@localhost:27017/mijnDatabase?authSource=admin
 ollama:
   base-url: http://127.0.0.1:11434
   model: qwen3.5:4b

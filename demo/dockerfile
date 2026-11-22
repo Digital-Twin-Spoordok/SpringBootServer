@@ -1,0 +1,18 @@
+
+# Gebruik Java 22 als basis
+FROM eclipse-temurin:22-jdk
+
+# Werkmap in de container
+WORKDIR /app
+
+# Kopieer Maven-project naar de container
+COPY . .
+
+# Bouw de Spring Boot applicatie
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
+
+# Maak poort 8080 beschikbaar
+EXPOSE 8080
+
+# Start de Spring Boot applicatie
+CMD ["sh", "-c", "java -jar target/*.jar"]

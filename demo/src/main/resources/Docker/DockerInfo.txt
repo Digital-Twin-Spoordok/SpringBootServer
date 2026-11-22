@@ -2,3 +2,28 @@ docker exec -it mongodb mongosh -u admin -p secret --authenticationDatabase admi
 use test
 show collections
 db.users.find().pretty()
+
+Start beide containers opnieuw:
+docker compose down
+docker compose up -d --build
+
+Controleer de status:
+docker compose ps
+
+Controleer de Spring Boot-logs:
+docker logs springboot-server
+
+Voor de springboot server:
+docker exec -it springboot-server sh
+Je bevindt je nu in de Linux-shell van je Spring Boot-container.
+
+whoami
+Laat zien onder welke gebruiker je werkt.
+
+pwd
+Laat zien in welke directory je zit.
+
+ls
+Laat de bestanden en mappen zien.
+
+cat /etc/os-release

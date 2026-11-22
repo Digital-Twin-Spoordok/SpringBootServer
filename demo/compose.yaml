@@ -1,5 +1,6 @@
 
 services:
+  # MongoDB database server
   mongodb:
     image: mongo:8
     container_name: mongodb
@@ -15,6 +16,41 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - -u
+        - admin
+        - -p
+        - secret
+        - --authenticationDatabase
+        - admin
+        - --eval
+        - "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot application server
+  springboot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: springboot-server
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_MONGODB_URI: mongodb://admin:secret@mongodb:27017/mijnDatabase?authSource=admin
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
 volumes:
   mongodb_data:
-
