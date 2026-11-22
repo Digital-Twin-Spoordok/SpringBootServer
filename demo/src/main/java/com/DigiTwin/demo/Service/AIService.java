@@ -23,7 +23,7 @@ public class AIService {
     public AIService(
             WebClient.Builder builder,
             ResourceLoader resourceLoader,
-            @Value("${ollama.base-url:http://localhost:11434}")
+            @Value("${ollama.base-url:http://host.docker.internal:11434}")
             String baseUrl,
             @Value("${ollama.model:qwen3.5:4b}")
             String model) {

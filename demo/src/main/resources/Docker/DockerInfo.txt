@@ -1,3 +1,5 @@
+BELANGRIJK!! ALS JE IETS AANPAST MOET JE HET OPNIEUW BUILDEN IN DOCKER
+
 docker exec -it mongodb mongosh -u admin -p secret --authenticationDatabase admin
 use test
 show collections
