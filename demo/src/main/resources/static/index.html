@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ontdek Digital Twin: een slim platform voor stedelijke visualisatie, data en AI.">
+    <title>Digital Twin | Smart City Platform</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --background: #080d19;
+            --surface: #101a2b;
+            --surface-light: #17243a;
+            --text: #f4f7fc;
+            --muted: #94a3b8;
+            --blue: #398bff;
+            --cyan: #38d5ed;
+            --border: rgba(148, 163, 184, .15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1160px, 90%);
+            margin: auto;
+        }
+
+        /* NAVIGATION */
+
+        nav {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 13, 25, .88);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white;
+            font-size: 21px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 34px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 19px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: .2s ease;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: var(--surface-light);
+        }
+
+        .btn-primary {
+            background: linear-gradient(110deg, var(--blue), #2867e8);
+            color: white;
+            box-shadow: 0 6px 25px rgba(57, 139, 255, .2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 30px rgba(57, 139, 255, .35);
+        }
+
+        /* HERO */
+
+        .hero {
+            min-height: 680px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse at 78% 42%, rgba(30, 105, 220, .17), transparent 42%),
+                radial-gradient(ellipse at 10% 90%, rgba(0, 190, 220, .08), transparent 40%);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: .13;
+            background-image:
+                linear-gradient(rgba(90, 145, 210, .2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(90, 145, 210, .2) 1px, transparent 1px);
+            background-size: 55px 55px;
+            mask-image: linear-gradient(to bottom, black, transparent);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            z-index: 1;
+            padding: 80px 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: #70b7ff;
+            background: rgba(57, 139, 255, .1);
+            border: 1px solid rgba(57, 139, 255, .2);
+            border-radius: 30px;
+            padding: 8px 13px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+            margin-bottom: 26px;
+        }
+
+        .pulse {
+            width: 7px;
+            height: 7px;
+            background: #42e6b2;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #42e6b2;
+        }
+
+        h1 {
+            font-size: clamp(42px, 5vw, 66px);
+            line-height: 1.08;
+            letter-spacing: -3px;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        h1 span {
+            background: linear-gradient(100deg, #4a9cff, #42d9eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-description {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.9;
+            max-width: 510px;
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-bottom: 38px;
+        }
+
+        .hero-buttons .btn {
+            padding: 15px 22px;
+        }
+
+        .hero-note {
+            color: #718198;
+            font-size: 12px;
+        }
+
+        /* HERO VISUAL */
+
+        .visual {
+            position: relative;
+            min-height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .city-image {
+            position: relative;
+            width: 100%;
+            height: 370px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(79, 160, 255, .3);
+            background:
+                linear-gradient(180deg, rgba(8, 17, 33, .05), rgba(8, 17, 33, .55)),
+                url("https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=85") center/cover;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .45);
+        }
+
+        .city-image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, transparent 40%, rgba(39, 139, 255, .18)),
+                repeating-linear-gradient(0deg, transparent 0 49px, rgba(65, 170, 255, .12) 50px);
+        }
+
+        .data-card {
+            position: absolute;
+            z-index: 2;
+            background: rgba(12, 24, 43, .91);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(94, 166, 255, .3);
+            border-radius: 12px;
+            padding: 16px 19px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .3);
+        }
+
+        .data-card small {
+            display: block;
+            color: #91a5c1;
+            font-size: 10px;
+            margin-bottom: 7px;
+        }
+
+        .data-card strong {
+            font-size: 19px;
+        }
+
+        .data-card.top {
+            top: 15px;
+            right: -15px;
+        }
+
+        .data-card.bottom {
+            bottom: 15px;
+            left: -25px;
+        }
+
+        .data-card .status {
+            color: #43dfaa;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        /* FEATURES */
+
+        section {
+            padding: 100px 0;
+        }
+
+        .section-heading {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 55px;
+        }
+
+        .section-heading .eyebrow {
+            margin-bottom: 17px;
+        }
+
+        h2 {
+            font-size: clamp(29px, 4vw, 42px);
+            letter-spacing: -1.5px;
+            margin-bottom: 17px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, #111d30, #0d1524);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            transition: .25s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(57, 139, 255, .5);
+        }
+
+        .feature-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: rgba(57, 139, 255, .13);
+            color: #63aaff;
+            font-size: 23px;
+            margin-bottom: 23px;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* PLATFORM */
+
+        .platform {
+            background: #0c1422;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .platform-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 65px;
+        }
+
+        .platform-visual {
+            min-height: 310px;
+            border-radius: 18px;
+            border: 1px solid rgba(57, 139, 255, .25);
+            background:
+                radial-gradient(circle at 50% 50%, rgba(57, 139, 255, .2), transparent 55%),
+                linear-gradient(135deg, #101f36, #0b1424);
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-visual::before {
+            content: "";
+            position: absolute;
+            width: 330px;
+            height: 330px;
+            border: 1px solid rgba(57, 139, 255, .3);
+            transform: rotate(45deg);
+        }
+
+        .platform-visual::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(56, 213, 237, .25);
+            transform: rotate(45deg);
+        }
+
+        .platform-symbol {
+            font-size: 85px;
+            color: #58a8ff;
+            z-index: 1;
+            text-shadow: 0 0 40px rgba(57, 139, 255, .5);
+        }
+
+        .platform-text p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.9;
+            margin-bottom: 25px;
+        }
+
+        .platform-list {
+            list-style: none;
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .platform-list li {
+            color: #c6d2e4;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .check {
+            color: #40d9ad;
+            font-size: 17px;
+        }
+
+        /* CTA */
+
+        .cta {
+            text-align: center;
+            padding: 90px 25px;
+            background:
+                radial-gradient(ellipse at 50% 100%, rgba(39, 123, 255, .2), transparent 65%);
+        }
+
+        .cta p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 550px;
+            margin: 0 auto 28px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 30px 0;
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            color: #718198;
+            font-size: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 23px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 850px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content,
+            .platform-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content {
+                gap: 20px;
+            }
+
+            .visual {
+                min-height: 350px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-content {
+                gap: 35px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            nav {
+                height: 70px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .nav-actions {
+                gap: 7px;
+            }
+
+            .nav-actions .btn {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .hero-content {
+                padding: 65px 0;
+            }
+
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .city-image {
+                height: 280px;
+            }
+
+            .data-card.top {
+                right: -5px;
+            }
+
+            .data-card.bottom {
+                left: -5px;
+            }
+
+            section {
+                padding: 70px 0;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="container nav-content">
+
+            <a href="/" class="logo">
+                <div class="logo-icon">◈</div>
+                <span>Digital<span style="color:#54a8ff">Twin</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#mogelijkheden">Mogelijkheden</a>
+                <a href="#platform">Het platform</a>
+                <a href="#over">Over ons</a>
+            </div>
+
+            <div class="nav-actions">
+                <a href="/login.html" class="btn btn-outline">Inloggen</a>
+                <a href="/register.html" class="btn btn-primary">Aan de slag ↗</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+        <div class="container hero-content">
+
+            <div>
+                <div class="eyebrow">
+                    <span class="pulse"></span>
+                    De toekomst van slimme steden
+                </div>
+
+                <h1>
+                    De fysieke wereld.
+                    <span>Digitaal verbonden.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Ontdek een nieuwe manier om steden te bekijken,
+                    begrijpen en ontwikkelen. Breng gebouwen, locaties,
+                    data en kunstmatige intelligentie samen in één
+                    interactieve Digital Twin.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="/register.html" class="btn btn-primary">
+                        Ontdek het platform →
+                    </a>
+
+                    <a href="#mogelijkheden" class="btn btn-outline">
+                        Meer informatie
+                    </a>
+                </div>
+
+                <div class="hero-note">
+                    Een digitale omgeving voor inzicht, innovatie en samenwerking.
+                </div>
+            </div>
+
+            <div class="visual">
+                <div class="city-image"></div>
+
+                <div class="data-card top">
+                    <small>PLATFORM STATUS</small>
+                    <strong>Digital Twin</strong>
+                    <div class="status">● Systeem beschikbaar</div>
+                </div>
+
+                <div class="data-card bottom">
+                    <small>SLIMME STAD</small>
+                    <strong>3D + DATA + AI</strong>
+                    <div class="status">● Interactieve omgeving</div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- FEATURES -->
+    <section id="mogelijkheden">
+        <div class="container">
+
+            <div class="section-heading">
+                <div class="eyebrow">Mogelijkheden</div>
+                <h2>Meer inzicht in de wereld om je heen.</h2>
+                <p>
+                    Een Digital Twin brengt verschillende technologieën
+                    samen om de fysieke omgeving digitaal inzichtelijk
+                    en interactief te maken.
+                </p>
+            </div>
+
+            <div class="features">
+
+                <article class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Interactieve 3D-omgeving</h3>
+                    <p>
+                        Verken een digitale weergave van de fysieke
+                        omgeving. Bekijk gebouwen, locaties en
+                        ontwikkelingen vanuit verschillende perspectieven.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">✦</div>
+                    <h3>AI-assistent</h3>
+                    <p>
+                        Stel vragen aan een intelligente assistent.
+                        Gebruik natuurlijke taal om informatie op te
+                        vragen en acties uit te voeren in de digitale omgeving.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">▥</div>
+                    <h3>Data en inzicht</h3>
+                    <p>
+                        Breng informatie en gegevens samen.
+                        Gebruik de digitale omgeving als basis voor
+                        analyse, inzicht en toekomstige ontwikkelingen.
+                    </p>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATFORM -->
+    <section class="platform" id="platform">
+        <div class="container platform-content">
+
+            <div class="platform-visual">
+                <div class="platform-symbol">◈</div>
+            </div>
+
+            <div class="platform-text">
+                <div class="eyebrow">Eén verbonden platform</div>
+
+                <h2>Van digitale kaart naar intelligente omgeving.</h2>
+
+                <p>
+                    Een Digital Twin is meer dan een 3D-model.
+                    Het is een omgeving waarin visualisatie, informatie
+                    en slimme technologie samenkomen.
+                </p>
+
+                <ul class="platform-list">
+                    <li><span class="check">✓</span> Interactie met gebouwen en locaties</li>
+                    <li><span class="check">✓</span> AI-gestuurde functionaliteiten</li>
+                    <li><span class="check">✓</span> Een uitbreidbaar platform</li>
+                    <li><span class="check">✓</span> Ruimte voor ontwikkelaars en innovatie</li>
+                </ul>
+
+                <a href="/register.html" class="btn btn-primary">
+                    Maak een account aan →
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="over">
+        <div class="container section-heading">
+            <div class="eyebrow">Onze visie</div>
+            <h2>Een slimmere kijk op de fysieke wereld.</h2>
+            <p>
+                We bouwen aan een platform waarin steden, technologie
+                en mensen dichter bij elkaar komen. Een plek waar
+                digitale innovatie helpt om de fysieke omgeving beter
+                te begrijpen en nieuwe ideeën werkelijkheid te maken.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="eyebrow">Begin vandaag</div>
+            <h2>Ontdek de mogelijkheden van Digital Twin.</h2>
+
+            <p>
+                Maak kennis met een nieuwe manier om de wereld digitaal
+                te verkennen. Log in of maak een account aan.
+            </p>
+
+            <a href="/register.html" class="btn btn-primary">
+                Start met Digital Twin →
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-content">
+
+            <a href="/" class="logo">
+                <div class="logo-icon">◈</div>
+                <span>Digital<span style="color:#54a8ff">Twin</span></span>
+            </a>
+
+            <span>© 2026 Digital Twin. Alle rechten voorbehouden.</span>
+
+            <div class="footer-links">
+                <a href="/login.html">Inloggen</a>
+                <a href="/register.html">Registreren</a>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+
+</html>

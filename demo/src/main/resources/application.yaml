@@ -7,5 +7,9 @@ spring:
 ollama:
   base-url: http://host.docker.internal:11434
   model: qwen3.5:4b
-
+app:
+  jwt:
+    # Vervang dit door een willekeurige geheime sleutel van minimaal 32 bytes.
+    secret: "HIABUDHUACKJXBCJBAWUOH@EY!*YE*#YRG"
+    expiration-ms: 86400000
 

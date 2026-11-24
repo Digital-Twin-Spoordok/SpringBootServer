@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>Digital Twin | Developer Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js" defer></script>
+  <script src="../js/dev-guard.js"></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" aria-label="Digital Twin dashboard">
+        <span class="brand-mark">◈</span>
+        <span><strong>DIGITAL TWIN</strong><small>Developer Portal</small></span>
+      </a>
+      <div class="workspace-switch">
+        <span class="workspace-icon">D</span>
+        <span><strong>Local workspace</strong><small>Development environment</small></span>
+        <span class="chevron">⌄</span>
+      </div>
+      <nav class="navigation" aria-label="Hoofdnavigatie">
+        <div class="nav-label">WORKSPACE</div>
+        <a class="nav-item active" href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span>Dashboard</a>
+        <a class="nav-item" href="#ai" data-page="ai"><span class="nav-icon">✳</span>AI Configuration</a>
+        <a class="nav-item" href="#playground" data-page="playground"><span class="nav-icon">⌘</span>AI Playground</a>
+        <div class="nav-label">MANAGEMENT</div>
+        <a class="nav-item" href="#users" data-page="users"><span class="nav-icon">♙</span>Users</a>
+        <a class="nav-item" href="#projects" data-page="projects"><span class="nav-icon">▤</span>Projects</a>
+        <a class="nav-item" href="#assets" data-page="assets"><span class="nav-icon">⬡</span>Assets</a>
+        <div class="nav-label">SYSTEM</div>
+        <a class="nav-item" href="#logs" data-page="logs"><span class="nav-icon">≋</span>API &amp; Logs</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="server-indicator"><span class="pulse-dot"></span><span id="sidebar-server-status">Checking
+            server…</span></div>
+        <div class="sidebar-user">
+          <div class="avatar">AD</div>
+          <div><strong>Local administrator</strong><small>Development mode</small></div><span class="more">•••</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="mobile-menu" aria-label="Menu">☰</button>
+        <div class="breadcrumbs"><span>Developer Portal</span><span class="slash">/</span><strong
+            id="breadcrumb-current">Dashboard</strong></div>
+        <div class="topbar-actions">
+          <span class="environment-tag"><span></span> LOCAL</span>
+          <button class="icon-button" id="refresh-page" title="Vernieuwen" aria-label="Vernieuwen">↻</button>
+          <div class="topbar-date" id="clock"></div>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="page active" id="page-dashboard">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">OVERVIEW</div>
+              <h1>Good afternoon<span class="accent">.</span></h1>
+              <p>Beheer en monitor je Digital Twin-omgeving vanaf één plek.</p>
+            </div>
+            <button class="btn btn-secondary" data-action="refresh"><span>↻</span> Refresh data</button>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-top"><span>Backend API</span><span class="metric-icon cyan">⌘</span></div>
+              <div class="metric-value" id="metric-backend">Checking…</div>
+              <div class="metric-foot"><span class="status-dot" id="dot-backend"></span><span
+                  id="metric-backend-note">Verbinding controleren</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>MongoDB</span><span class="metric-icon green">◉</span></div>
+              <div class="metric-value" id="metric-db">Checking…</div>
+              <div class="metric-foot"><span class="status-dot" id="dot-db"></span><span
+                  id="metric-db-note">Databaseverbinding controleren</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>AI service</span><span class="metric-icon purple">✳</span></div>
+              <div class="metric-value" id="metric-ai">Checking…</div>
+              <div class="metric-foot"><span class="status-dot" id="dot-ai"></span><span
+                  id="metric-ai-note">Ollama-status controleren</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>Configured model</span><span class="metric-icon orange">◈</span></div>
+              <div class="metric-value metric-model" id="metric-model">—</div>
+              <div class="metric-foot"><span class="muted">Actief AI-model</span></div>
+            </article>
+          </div>
+          <div class="content-grid dashboard-grid">
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Quick actions</h2>
+                  <p>Veelgebruikte beheeracties</p>
+                </div>
+              </div>
+              <div class="quick-grid">
+                <button class="quick-action" data-go="ai"><span class="quick-icon cyan">✳</span><strong>Configure
+                    AI</strong><small>Model en prompt aanpassen</small><span class="quick-arrow">↗</span></button>
+                <button class="quick-action" data-go="users"><span class="quick-icon purple">♙</span><strong>Manage
+                    users</strong><small>Gebruikers beheren</small><span class="quick-arrow">↗</span></button>
+                <button class="quick-action" data-go="projects"><span class="quick-icon green">▤</span><strong>View
+                    projects</strong><small>Projecten beheren</small><span class="quick-arrow">↗</span></button>
+                <button class="quick-action" data-go="assets"><span class="quick-icon orange">⬡</span><strong>Manage
+                    assets</strong><small>Objectmetadata bekijken</small><span class="quick-arrow">↗</span></button>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Environment</h2>
+                  <p>Lokale serverconfiguratie</p>
+                </div><span class="live-tag"><span></span> LIVE</span>
+              </div>
+              <div class="environment-list">
+                <div><span>Spring Boot</span><strong>localhost:8080</strong></div>
+                <div><span>MongoDB</span><strong>mongodb:27017</strong></div>
+                <div><span>AI provider</span><strong>Ollama</strong></div>
+                <div><span>Dashboard</span><strong>/dev/</strong></div>
+              </div>
+            </article>
+          </div>
+          <article class="panel activity-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Recent activity</h2>
+                <p>Recente systeemgebeurtenissen</p>
+              </div><button class="text-button" data-go="logs">View logs ↗</button>
+            </div>
+            <div id="recent-activity" class="empty-state compact"><span class="empty-icon">≋</span><strong>Nog geen
+                activiteit beschikbaar</strong>
+              <p>Activiteiten verschijnen hier zodra de logs-API is aangesloten.</p>
+            </div>
+          </article>
+        </section>
+
+        <section class="page" id="page-ai">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">CONFIGURATION</div>
+              <h1>AI Configuration</h1>
+              <p>Beheer de verbinding met Ollama en de instellingen van je AI-assistent.</p>
+            </div><span class="page-status" id="ai-connection-status">Niet gecontroleerd</span>
+          </div>
+          <div class="content-grid two-col">
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Model settings</h2>
+                  <p>Instellingen voor de actieve AI-provider</p>
+                </div>
+              </div>
+              <form id="ai-settings-form" class="form-stack">
+                <label>Provider<input name="provider" value="Ollama" readonly></label>
+                <label>Model name<input name="model" id="ai-model" placeholder="qwen3.5:4b" required></label>
+                <label>Base URL<input name="baseUrl" id="ai-base-url" placeholder="http://host.docker.internal:11434"
+                    required></label>
+                <div class="form-row">
+                  <label>Temperature<input name="temperature" id="ai-temperature" type="number" min="0" max="2"
+                      step="0.1" value="0.7"></label>
+                  <label>Max tokens<input name="maxTokens" id="ai-max-tokens" type="number" min="1" max="32768"
+                      value="2048"></label>
+                </div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" id="test-ai">Test
+                    connection</button><button class="btn btn-primary" type="submit">Save settings
+                    <span>→</span></button></div>
+                <p class="form-hint">API-sleutels en wachtwoorden horen uitsluitend op de server te worden opgeslagen,
+                  nooit in deze browser.</p>
+              </form>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>System prompt</h2>
+                  <p>Gedrag en instructies van de assistent</p>
+                </div>
+              </div>
+              <form id="prompt-form" class="form-stack">
+                <label>System prompt<textarea id="system-prompt" rows="13"
+                    placeholder="Beschrijf de rol, regels en mogelijkheden van je Digital Twin-assistent…"></textarea></label>
+                <div class="form-actions"><button class="btn btn-primary" type="submit">Save prompt
+                    <span>→</span></button></div>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" id="page-playground">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">TEST ENVIRONMENT</div>
+              <h1>AI Playground</h1>
+              <p>Test je AI-assistent en inspecteer de ontvangen respons.</p>
+            </div><span class="page-status">Ollama · local</span>
+          </div>
+          <div class="playground panel">
+            <div class="playground-head">
+              <div><span class="ai-orb">✳</span>
+                <div><strong>Digital Twin Assistant</strong><small>Berichten worden via Spring Boot naar Ollama
+                    gestuurd.</small></div>
+              </div><span class="live-tag"><span></span> READY</span>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+              <div class="chat-welcome"><span class="welcome-orb">✳</span>
+                <h2>Test je AI-assistent</h2>
+                <p>Stel een vraag over je Digital Twin-omgeving of test een beschikbare tool.</p>
+              </div>
+            </div>
+            <form id="chat-form" class="chat-input-area"><textarea id="chat-input" rows="1"
+                placeholder="Typ je bericht…" required></textarea><button class="send-button" type="submit"
+                aria-label="Verstuur">↑</button></form>
+            <div class="chat-disclaimer">Developer Playground · Controleer tool calls voordat je ze in productie
+              gebruikt.</div>
+          </div>
+        </section>
+
+        <section class="page" id="page-users">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">MANAGEMENT</div>
+              <h1>Users</h1>
+              <p>Beheer accounts en rollen binnen je Digital Twin-platform.</p>
+            </div><button class="btn btn-primary" data-create="users">＋ Add user</button>
+          </div>
+          <article class="panel table-panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>All users</h2>
+                <p id="users-count">Gebruikers ophalen…</p>
+              </div><input class="search-input" data-search="users" placeholder="Search users…">
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>USER</th>
+                    <th>EMAIL</th>
+                    <th>ROLE</th>
+                    <th>STATUS</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="users-table">
+                  <tr>
+                    <td colspan="5" class="table-message">Verbinding maken met API…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="page" id="page-projects">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">MANAGEMENT</div>
+              <h1>Projects</h1>
+              <p>Organiseer Digital Twin-projecten en hun instellingen.</p>
+            </div><button class="btn btn-primary" data-create="projects">＋ New project</button>
+          </div>
+          <article class="panel table-panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>All projects</h2>
+                <p id="projects-count">Projecten ophalen…</p>
+              </div><input class="search-input" data-search="projects" placeholder="Search projects…">
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>PROJECT</th>
+                    <th>DESCRIPTION</th>
+                    <th>STATUS</th>
+                    <th>CREATED</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="projects-table">
+                  <tr>
+                    <td colspan="5" class="table-message">Verbinding maken met API…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="page" id="page-assets">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">MANAGEMENT</div>
+              <h1>Assets</h1>
+              <p>Beheer objecten en hun 3D-metadata. Deze omgeving rendert geen 3D-modellen.</p>
+            </div><button class="btn btn-primary" data-create="assets">＋ Add asset</button>
+          </div>
+          <article class="panel table-panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>Asset library</h2>
+                <p id="assets-count">Assets ophalen…</p>
+              </div><input class="search-input" data-search="assets" placeholder="Search assets…">
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ASSET</th>
+                    <th>TYPE</th>
+                    <th>PROJECT / SITE</th>
+                    <th>MODEL FILE</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="assets-table">
+                  <tr>
+                    <td colspan="5" class="table-message">Verbinding maken met API…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <div class="asset-detail panel" id="asset-detail">
+            <div class="empty-state compact"><span class="empty-icon">⬡</span><strong>Select an asset</strong>
+              <p>Selecteer een asset in de tabel om de technische eigenschappen te bekijken.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-logs">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">SYSTEM</div>
+              <h1>API &amp; Logs</h1>
+              <p>Bekijk recente API-activiteit en backendmeldingen.</p>
+            </div><button class="btn btn-secondary" id="refresh-logs">↻ Refresh logs</button>
+          </div>
+          <article class="panel table-panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>System events</h2>
+                <p>Nieuwste gebeurtenissen bovenaan</p>
+              </div><select class="search-input" id="log-level">
+                <option value="all">All levels</option>
+                <option value="INFO">Info</option>
+                <option value="WARN">Warning</option>
+                <option value="ERROR">Error</option>
+              </select>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>TIME</th>
+                    <th>LEVEL</th>
+                    <th>COMPONENT</th>
+                    <th>MESSAGE</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-table">
+                  <tr>
+                    <td colspan="4" class="table-message">Logs-API nog niet aangesloten.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </div>
+      <footer class="footer"><span>Digital Twin Developer Portal</span><span>Local development environment
+          <i></i></span></footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-heading">
+        <div>
+          <div class="eyebrow">MANAGEMENT</div>
+          <h2 id="modal-title">Create item</h2>
+        </div><button class="icon-button" id="modal-close" aria-label="Sluiten">×</button>
+      </div>
+      <form id="entity-form" class="form-stack">
+        <div id="modal-fields"></div>
+        <div class="form-actions"><button type="button" class="btn btn-secondary"
+            id="modal-cancel">Cancel</button><button type="submit" class="btn btn-primary">Save changes
+            <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+</body>
+
+</html>
