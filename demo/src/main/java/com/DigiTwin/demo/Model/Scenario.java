@@ -18,6 +18,7 @@ public class Scenario {
     private String status = "ACTIVE";
     private String activeVersionId;
     private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
 
     public Scenario() {}
 
@@ -75,5 +76,12 @@ public class Scenario {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

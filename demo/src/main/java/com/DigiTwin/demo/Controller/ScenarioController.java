@@ -1,6 +1,7 @@
 
 package com.DigiTwin.demo.Controller;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,8 @@ public class ScenarioController {
         scenario.setId(null);
         scenario.setProjectId(projectId);
         scenario.setActiveVersionId(null);
+        scenario.setCreatedAt(Instant.now());
+        scenario.setUpdatedAt(Instant.now());
 
         if (scenario.getName() == null ||
                 scenario.getName().isBlank()) {
@@ -91,6 +94,32 @@ public class ScenarioController {
 
         return scenarioRepository.save(scenario);
     }
+
+
+    
+    @PostMapping("/projects/{projectId}/scenarios/{id}/duplicate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Scenario duplicate(
+            @PathVariable String projectId,
+            @RequestBody Scenario scenario,
+            Authentication auth) {
+
+        Scenario original = getOwnedScenario(scenario.getId(), auth);
+
+        Scenario copy = new Scenario();
+
+        copy.setProjectId(original.getProjectId());
+        copy.setName(original.getName() + " (kopie)");
+        copy.setDescription(original.getDescription());
+        copy.setStatus("DRAFT");
+        copy.setActiveVersionId(null);
+        copy.setCreatedAt(Instant.now());
+        copy.setUpdatedAt(Instant.now());
+
+        return scenarioRepository.save(copy);
+    }
+
+
 
     // Scenario wijzigen
     @PutMapping("/scenarios/{id}")
@@ -111,6 +140,7 @@ public class ScenarioController {
         existing.setName(updated.getName());
         existing.setDescription(updated.getDescription());
         existing.setStatus(updated.getStatus());
+        existing.setUpdatedAt(Instant.now());
 
         return scenarioRepository.save(existing);
     }
