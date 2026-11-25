@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("projects")
 public class Project {
     @Id private String id;
+    private int defaultAIConfigurationID;
     private String name;
     private String description;
     private String ownerId;
@@ -20,4 +21,10 @@ public class Project {
     public String getOwnerId(){return ownerId;} public void setOwnerId(String v){ownerId=v;}
     public String getStatus(){return status;} public void setStatus(String v){status=v;}
     public Instant getCreatedAt(){return createdAt;} public void setCreatedAt(Instant v){createdAt=v;}
+    public int getDefaultAIConfigurationID() {
+        return defaultAIConfigurationID;
+    }
+    public void setDefaultAIConfigurationID(int value) {
+        this.defaultAIConfigurationID = value;
+    }
 }
