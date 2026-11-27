@@ -12,7 +12,7 @@ import com.DigiTwin.demo.Model.Project;
 import com.DigiTwin.demo.Repository.ProjectRepository;
 
 @RestController
-@CrossOrigin(origins = "http://127.0.0.1:5500/")
+@CrossOrigin(origins = {"http://localhost:5500/", "http://localhost:63342"})
 @RequestMapping("/api/projects")
 public class ProjectController {
 

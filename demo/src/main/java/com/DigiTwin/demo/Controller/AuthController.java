@@ -12,6 +12,7 @@ import com.DigiTwin.demo.Service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = {"http://localhost:5500/", "http://localhost:63342"})
 public class AuthController {
     private final UserService users;
     private final JwtService jwt;
