@@ -9,10 +9,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.DigiTwin.demo.Model.CreateScenarioVersionRequest;
 import com.DigiTwin.demo.Model.Project;
 import com.DigiTwin.demo.Model.Scenario;
+import com.DigiTwin.demo.Model.ScenarioVersion;
 import com.DigiTwin.demo.Repository.ProjectRepository;
 import com.DigiTwin.demo.Repository.ScenarioRepository;
+import com.DigiTwin.demo.Service.ScenarioVersionService;
 
 @RestController
 @RequestMapping("/api")
@@ -20,12 +23,16 @@ public class ScenarioController {
 
     private final ScenarioRepository scenarioRepository;
     private final ProjectRepository projectRepository;
+    private final ScenarioVersionService versionService;
 
     public ScenarioController(
             ScenarioRepository scenarioRepository,
-            ProjectRepository projectRepository) {
+            ProjectRepository projectRepository,
+            ScenarioVersionService versionService) {
+
         this.scenarioRepository = scenarioRepository;
         this.projectRepository = projectRepository;
+        this.versionService = versionService;
     }
 
     private Project getOwnedProject(
@@ -34,7 +41,8 @@ public class ScenarioController {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Project niet gevonden."));
+                        HttpStatus.NOT_FOUND,
+                        "Project niet gevonden."));
 
         if (!authentication.getName().equals(project.getOwnerId())) {
             throw new ResponseStatusException(
@@ -51,7 +59,8 @@ public class ScenarioController {
 
         Scenario scenario = scenarioRepository.findById(scenarioId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Scenario niet gevonden."));
+                        HttpStatus.NOT_FOUND,
+                        "Scenario niet gevonden."));
 
         getOwnedProject(scenario.getProjectId(), authentication);
 
@@ -69,7 +78,7 @@ public class ScenarioController {
         return scenarioRepository.findByProjectId(projectId);
     }
 
-    // Scenario aanmaken
+    // Scenario aanmaken inclusief eerste versie
     @PostMapping("/projects/{projectId}/scenarios")
     @ResponseStatus(HttpStatus.CREATED)
     public Scenario create(
@@ -79,47 +88,145 @@ public class ScenarioController {
 
         getOwnedProject(projectId, authentication);
 
+        if (scenario.getName() == null ||
+                scenario.getName().isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Een scenarionaam is verplicht.");
+        }
+
         scenario.setId(null);
         scenario.setProjectId(projectId);
         scenario.setActiveVersionId(null);
         scenario.setCreatedAt(Instant.now());
         scenario.setUpdatedAt(Instant.now());
 
-        if (scenario.getName() == null ||
-                scenario.getName().isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Een scenarionaam is verplicht.");
-        }
+        Scenario savedScenario = scenarioRepository.save(scenario);
 
-        return scenarioRepository.save(scenario);
+        versionService.createInitialVersion(
+                savedScenario,
+                authentication.getName());
+
+        return scenarioRepository.findById(savedScenario.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Scenario niet gevonden."));
     }
 
+    // Alle versies ophalen
+    @GetMapping("/scenarios/{id}/versions")
+    public List<ScenarioVersion> getVersions(
+            @PathVariable String id,
+            Authentication authentication) {
 
-    
-    @PostMapping("/projects/{projectId}/scenarios/{id}/duplicate")
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.getVersions(scenario.getId());
+    }
+
+    // Actieve versie ophalen
+    @GetMapping("/scenarios/{id}/active-version")
+    public ScenarioVersion getActiveVersion(
+            @PathVariable String id,
+            Authentication authentication) {
+
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.getActiveVersion(scenario);
+    }
+
+    // Specifieke versie ophalen
+    @GetMapping("/scenarios/{id}/versions/{versionId}")
+    public ScenarioVersion getVersion(
+            @PathVariable String id,
+            @PathVariable String versionId,
+            Authentication authentication) {
+
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.getVersion(
+                scenario.getId(),
+                versionId);
+    }
+
+    // Nieuwe versie opslaan
+    @PostMapping("/scenarios/{id}/versions")
     @ResponseStatus(HttpStatus.CREATED)
-    public Scenario duplicate(
-            @PathVariable String projectId,
-            @RequestBody Scenario scenario,
-            Authentication auth) {
+    public ScenarioVersion createVersion(
+            @PathVariable String id,
+            @RequestBody CreateScenarioVersionRequest request,
+            Authentication authentication) {
 
-        Scenario original = getOwnedScenario(scenario.getId(), auth);
+        Scenario scenario = getOwnedScenario(id, authentication);
 
-        Scenario copy = new Scenario();
-
-        copy.setProjectId(original.getProjectId());
-        copy.setName(original.getName() + " (kopie)");
-        copy.setDescription(original.getDescription());
-        copy.setStatus("DRAFT");
-        copy.setActiveVersionId(null);
-        copy.setCreatedAt(Instant.now());
-        copy.setUpdatedAt(Instant.now());
-
-        return scenarioRepository.save(copy);
+        return versionService.createVersion(
+                scenario,
+                request,
+                authentication.getName());
     }
 
+    // Oude versie herstellen als nieuwe versie
+    @PostMapping("/scenarios/{id}/versions/{versionId}/restore")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ScenarioVersion restoreVersion(
+            @PathVariable String id,
+            @PathVariable String versionId,
+            Authentication authentication) {
 
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.restoreVersion(
+                scenario,
+                versionId,
+                authentication.getName());
+    }
+
+    // Versie dupliceren
+    @PostMapping("/scenarios/{id}/versions/{versionId}/duplicate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ScenarioVersion duplicateVersion(
+            @PathVariable String id,
+            @PathVariable String versionId,
+            Authentication authentication) {
+
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.duplicateVersion(
+                scenario,
+                versionId,
+                authentication.getName());
+    }
+
+    // Versie aanpassen
+    @PutMapping("/scenarios/{id}/versions/{versionId}")
+    public ScenarioVersion updateVersion(
+            @PathVariable String id,
+            @PathVariable String versionId,
+            @RequestBody UpdateVersionRequest request,
+            Authentication authentication) {
+
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        return versionService.updateVersion(
+                scenario.getId(),
+                versionId,
+                request.getName(),
+                request.getDescription());
+    }
+
+    // Versie verwijderen
+    @DeleteMapping("/scenarios/{id}/versions/{versionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteVersion(
+            @PathVariable String id,
+            @PathVariable String versionId,
+            Authentication authentication) {
+
+        Scenario scenario = getOwnedScenario(id, authentication);
+
+        versionService.deleteVersion(scenario, versionId);
+    }
 
     // Scenario wijzigen
     @PutMapping("/scenarios/{id}")
@@ -132,6 +239,7 @@ public class ScenarioController {
 
         if (updated.getName() == null ||
                 updated.getName().isBlank()) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Een scenarionaam is verplicht.");
@@ -155,5 +263,28 @@ public class ScenarioController {
         Scenario scenario = getOwnedScenario(id, authentication);
 
         scenarioRepository.delete(scenario);
+    }
+
+    // Requestmodel voor het aanpassen van een versie
+    public static class UpdateVersionRequest {
+
+        private String name;
+        private String description;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
     }
 }
